@@ -1,0 +1,73 @@
+{
+ :paths   ["src/clj" "src/cljc" "resources"]
+ :deps    {
+           com.github.seancorfield/next.jdbc                                {:mvn/version "1.3.981"}
+           com.mchange/c3p0                                                 {:mvn/version "0.9.5.5"}
+           org.postgresql/postgresql                                        {:mvn/version "42.5.4"}
+           cheshire/cheshire                                                {:mvn/version "5.13.0"}
+           clj-http/clj-http                                                {:mvn/version "3.13.0"}
+           com.amazonaws/aws-java-sdk-dynamodb                              {:mvn/version "1.12.767"} ; required for staging/production
+           com.amazonaws/aws-java-sdk-s3                                    {:mvn/version "1.12.767"}
+           com.amazonaws/aws-java-sdk-ses                                   {:mvn/version "1.12.767"}
+           com.atlassian.commonmark/commonmark                              {:mvn/version "0.17.0"} ;; Markdown
+           com.atlassian.commonmark/commonmark-ext-gfm-strikethrough        {:mvn/version "0.17.0"} ;; Github flavor markdown (strikethrough)
+           com.atlassian.commonmark/commonmark-ext-gfm-tables               {:mvn/version "0.17.0"} ;; Github flavor markdown (tables)
+           com.cleancoders.c3kit/bucket                                     {:mvn/version "2.1.3"}
+           com.cleancoders.c3kit/wire                                       {:git/url "https://github.com/cleancoders/c3kit-wire.git" :sha "2ea4ad1480976b535633c311fedb1f1a0c629344"}
+           com.datomic/peer                                                 {:mvn/version "1.0.7180"}
+
+           com.github.steffan-westcott/clj-otel-api                         {:mvn/version "0.2.7"}
+           com.github.steffan-westcott/clj-otel-sdk                         {:mvn/version "0.2.7"}
+           com.github.steffan-westcott/clj-otel-sdk-extension-autoconfigure {:mvn/version "0.2.7"}
+           io.opentelemetry/opentelemetry-exporter-otlp                     {:mvn/version "1.40.0"}
+
+           com.google.api-client/google-api-client                          {:mvn/version "2.6.0"} ;; :exclusions [com.google.guava/guava]}
+           compojure/compojure                                              {:mvn/version "1.7.1" :exclusions [ring/ring-core ring/ring-codec]}
+           hiccup/hiccup                                                    {:mvn/version "1.0.5"}
+           hickory/hickory                                                  {:mvn/version "0.7.1"}
+           hiccup-bridge/hiccup-bridge                                      {:mvn/version "1.0.1"}
+           org.clojure/clojure                                              {:mvn/version "1.11.3"}
+           org.clojure/data.csv                                             {:mvn/version "1.1.0"}
+           ring/ring-anti-forgery                                           {:mvn/version "1.3.1" :exclusions [commons-codec/commons-codec]}}
+
+ :aliases {
+           :test           {:extra-deps    {
+                                            clj-commons/secretary          {:mvn/version "1.2.4"}
+                                            cljsjs/react-chartjs-2         {:mvn/version "2.7.4-0" :exclusions [cljsjs/react]}
+                                            com.cleancoders.c3kit/scaffold {:mvn/version "2.0.4"}
+                                            juji/editscript                {:mvn/version "0.6.3"}
+                                            org.clojure/clojurescript      {:mvn/version "1.11.132"}
+                                            speclj/speclj                  {:mvn/version "3.4.8"}
+                                            venantius/accountant           {:mvn/version "0.2.5"}
+                                            }
+                            :override-deps {
+                                            ;speclj/speclj {:local/root "/Users/connorkilgore/Desktop/clean-coders/internal/speclj/target/speclj-3.4.9.jar"}
+                                            ;com.cleancoders.c3kit/wire {:local/root "../c3kit/wire"}
+                                            ;com.cleancoders.c3kit/bucket {:local/root "../c3kit/bucket"}
+                                            }
+                            :extra-paths   ["dev" "src/cljs" "spec/clj" "spec/cljc" "spec/cljs"]}
+           :antq           {:deps      {com.github.liquidz/antq {:mvn/version "2.8.1206"}}
+                            :main-opts ["-m" "antq.core"]}
+           :clean-db       {:main-opts ["-m" "cleandevdb"]}
+           :cljs           {:main-opts ["-m" "c3kit.scaffold.cljs"]}
+           :css            {:main-opts ["-m" "c3kit.scaffold.css"]}
+           :dev            {:main-opts ["-m" "epic.dev"]}
+           :dev-           {:main-opts ["-m" "epic.dev" "cljs" "css"]}
+           :migrate        {:main-opts ["-m" "c3kit.bucket.migration"]}
+           :repl           {:main-opts ["-e" "(require,'repl)" "-e" "(in-ns,'repl)" "--repl"]}
+           :run            {:main-opts ["-m" "epic.main"]
+                            :jvm-opts  ["-Dotel.traces.exporter=otlp"
+                                        "-Dotel.metrics.exporter=none"
+                                        "-Dotel.logs.exporter=none"
+                                        "-Dotel.exporter.otlp.traces.protocol=grpc"]}
+           :server         {:jvm-opts  ["-Xmx1g" "-server"
+                                        "-Dotel.traces.exporter=otlp"
+                                        "-Dotel.metrics.exporter=none"
+                                        "-Dotel.logs.exporter=none"
+                                        "-Dotel.exporter.otlp.traces.protocol=grpc"]
+                            :main-opts ["-m" "epic.main"]}
+           :spec           {:main-opts ["-m" "speclj.main" "-c"]}
+           :sync-users     {:main-opts ["-m" "epic.user-sync"]}
+           :loaded-project {:main-opts ["-m" "epic.loaded-project"]}
+           }
+ }
