@@ -5,6 +5,13 @@
             [config :as config]
             ))
 
+;(defn up []
+;  (db/tx {:kind :dog :name "fido" :id (ccc/new-uuid)}))
+;
+;(defn down []
+;  (let [fido (db/ffind-by :dog :name "fido")]
+;    (when fido (db/delete fido))))
+
 (def migration-dog
   {:kind (s/kind :dog)
    :id   {:type :uuid :db {:type "uuid PRIMARY KEY"} :strategy :pre-populated}

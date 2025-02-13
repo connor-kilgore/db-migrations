@@ -24,8 +24,8 @@
 (def dog
   {:kind (s/kind :dog)
    :id   {:type :uuid :db {:type "uuid PRIMARY KEY"} :strategy :pre-populated}
-   :name {:type :string :db {:type "text"}}
-   :age  {:type :long :db {:type "long"}}
+   ;:name {:type :string :db {:type "text"}}
+   ;:age  {:type :long :db {:type "long"}}
    })
 
 (def full-schema [dog])

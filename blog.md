@@ -37,7 +37,7 @@ to understand the distinction. High risk occurs when the migration requires any 
 2. data is being moved or modified
 3. columns are being altered
 
-High-risk migrations demand careful attention, as neglecting them can lead to significant repercussions. 
+High-risk migrations demand careful attention, as not being diligent can lead to significant repercussions. 
 To mitigate potential issues, such migrations require thorough testing, isolation, and close monitoring.
 Risk assessment should always lean on the side of caution—once a migration is deployed, reversing it may not be 
 an option. When in doubt, assume the highest possible risk.
@@ -167,6 +167,8 @@ Note how `db/tx`->`db/tx-`, `db/ffind-by`->`db/ffind-by-`, and `db/delete`->`db/
 `c3kit.bucket.api` behave similarly, but expect an explicit database implementation, allowing for more flexibility
 with the type of database and what schemas are installed into the legend.
 
+#### When is Schema Isolation Needed?
+
 ## Testing Migration Code
 
 ### Manual Testing
@@ -196,7 +198,7 @@ Once the expected behavior is reflected in the tests, the migration is ready for
 deployment.
 
 #### Isolated Schemas and Tests
-When using schema isolation, that will require a little extra work for the tests as well.
+When using schema isolation, it will require a little extra work for the tests as well.
 If left unchanged, these tests for adding Fido will not use the `:memory` implementation.
 As previously mentioned, the functions in the migration use an explicit database . 
 This means the `:jdbc` database becomes what is explicitly used in the test.
@@ -312,6 +314,36 @@ better to avoid deletion entirely. This decision at worst, leads to the database
 (defn down []
   (m/remove-attribute! "dog" "age"))
 ```
+
+### Handling Large Data
+Though handling large data doesn't inherently mean high-risk, typically these migrations are more difficult to execute
+properly. In that sense, the need for extra time and attention should be allotted for them as well. Every server has
+limitations on how much memory can be processed at once. Here's a naive approach towards creating one million new dogs.
+```clojure
+(defn up []
+  (let [dogs (for [i (range 1000000)]
+               {:kind :dog :age i :id (ccc/new-uuid)})]
+    (db/tx* dogs)))
+```
+This migration will place all the new dogs into a very large list of entities that get transacted all at once.
+It's possible that the machine running the migration will have a memory overload issue placing 1,000,000 entities
+into memory, and even more likely for the transaction to the database to timeout.
+```clojure
+(defn up []
+  (doseq [i (range 1000000)]
+    (db/tx {:kind :dog :age i :id (ccc/new-uuid)})))
+```
+Here is an approach that will more work much more effectively. In this case, dogs are processed one at a time, meaning
+the threat of an overflow or timeout is removed. However, this still requires 1,000,000 transactions to the database.
+```clojure
+(defn up []
+  (doseq [n (range 1000)]
+    (db/tx*
+      (for [m (range 1000)]
+        {:kind :dog :age (-> n (* 1000) (+ m)) :id (ccc/new-uuid)}))))
+```
+With this final approach, the number of transactions are reduced to 1,000 by creating new dogs in batches of 1,000
+at a time. Typically, batch processing is the best approach for large data migrations.
 
 ## Final Thoughts
 Migrations are scary, there's no doubt about it. They will bite hard if underestimated. This article

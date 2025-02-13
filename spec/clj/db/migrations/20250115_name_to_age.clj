@@ -18,12 +18,14 @@
 (def migration-db (db/create-db config/jdbc schemas))
 
 (defn up []
-  (m/add-attribute! "dog" "age" {:type :long})
-  (let [dogs (db/find-by- migration-db :dog)
-        updated-dogs (map #(assoc % :age (count (:name %))) dogs)]
-    (db/tx* migration-db updated-dogs))
-  (m/rename-attribute! "dog" "name" "dog" "name_deleted"))
-
+;  (m/add-attribute! "dog" "age" {:type :long})
+;  (let [dogs (db/find-by- migration-db :dog)
+;        updated-dogs (map #(assoc % :age (count (:name %))) dogs)]
+;    (db/tx* migration-db updated-dogs))
+;  (m/rename-attribute! "dog" "name" "dog" "name_deleted")
+  )
+;
 (defn down []
-  (m/rename-attribute! "dog" "name_deleted" "dog" "name")
-  (m/remove-attribute! "dog" "age"))
+;  (m/rename-attribute! "dog" "name_deleted" "dog" "name")
+;  (m/remove-attribute! "dog" "age")
+  )

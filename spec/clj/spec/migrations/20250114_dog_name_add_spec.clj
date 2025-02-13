@@ -1,4 +1,4 @@
-(ns db.migrations.20250114-dog-name-add-spec
+(ns spec.migrations.20250114-dog-name-add-spec
   (:require [c3kit.bucket.api :as db]
             [speclj.core :refer :all]
             [schema :as schema]
